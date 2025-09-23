@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}NextGen Summit 2.0{% endblock title %}</title>
-    <link rel="favicon" href="{% static 'images/logo.png' %}">
-    <link rel="stylesheet" href="">
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +44,19 @@
                 <a href="{% url 'home' %}#about" class="hover:text-brand-hover font-medium transition duration-300">About</a>
                 <a href="{% url 'home' %}#schedule" class="hover:text-brand-hover font-medium transition duration-300">Schedule</a>
                 <a href="{% url 'home' %}#faq" class="hover:text-brand-hover font-medium transition duration-300">FAQs</a>
-                <a href="#" class="hover:text-brand-hover font-medium transition duration-300">Login</a>
+                
+                {% if user.is_authenticated %}
+                    {% if user.userprofile.user_role == 'participant' %}
+                        <a href="{% url 'participant_dashboard' %}" class="hover:text-brand-hover font-medium transition duration-300">Dashboard</a>
+                    {% elif user.userprofile.user_role == 'judge' %}
+                        <a href="{% url 'judge_dashboard' %}" class="hover:text-brand-hover font-medium transition duration-300">Dashboard</a>
+                    {% elif user.userprofile.user_role == 'organizer' %}
+                        <a href="{% url 'organizer_dashboard' %}" class="hover:text-brand-hover font-medium transition duration-300">Dashboard</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="bg-brand-accent-1 text-white px-4 py-2 rounded-full hover:bg-brand-hover hover:text-black font-medium transition duration-300">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="bg-brand-accent-1 text-white px-4 py-2 rounded-full hover:bg-brand-hover hover:text-black font-medium transition duration-300">Login</a>
+                {% endif %}
             </div>
             <button id="mobile-menu-btn" class="md:hidden p-2 rounded-full hover:bg-gray-700 transition duration-300">
                 <svg class="w-6 h-6 text-brand-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -55,13 +66,24 @@
             <a href="{% url 'home' %}#about" class="block py-2 px-4 text-sm hover:bg-gray-700">About</a>
             <a href="{% url 'home' %}#schedule" class="block py-2 px-4 text-sm hover:bg-gray-700">Schedule</a>
             <a href="{% url 'home' %}#faq" class="block py-2 px-4 text-sm hover:bg-gray-700">FAQs</a>
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700">Login</a>
+        
+            {% if user.is_authenticated %}
+                {% if user.userprofile.user_role == 'participant' %}
+                    <a href="{% url 'participant_dashboard' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
+                {% elif user.userprofile.user_role == 'judge' %}
+                    <a href="{% url 'judge_dashboard' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
+                {% elif user.userprofile.user_role == 'organizer' %}
+                    <a href="{% url 'organizer_dashboard' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Dashboard</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Login</a>
+            {% endif %}
         </div>
     </header>
 
     <main class="flex-grow pt-24">
-        {% block content %}
-        {% endblock content %}
+        {% block content %}{% endblock content %}
     </main>
 
     <footer class="bg-brand-secondary/75 backdrop-filter backdrop-blur-lg shadow-inner mt-auto">
@@ -73,7 +95,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile menu toggle (belongs in base.html as it controls the header)
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     mobileMenuBtn.addEventListener('click', () => {

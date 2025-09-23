@@ -1,273 +1,192 @@
+{% extends 'event/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextGen Summit 2.0</title>
-    <link rel="favicon" href="{% static 'images/logo.png' %}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .text-gradient {
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .text-gradient-warm {
-            background-image: linear-gradient(to right, #FF5722, #FFEB3B);
-        }
-        .border-gradient {
-            border-image: linear-gradient(to right, #FF5722, #FFEB3B) 1;
-            border-width: 2px;
-            border-style: solid;
-        }
-        .social-link:hover svg {
-            fill: currentColor;
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        'brand-bg': '#181818',
-                        'brand-text': '#F7F7F7',
-                        'brand-accent-1': '#FF5722', // Vibrant Orange
-                        'brand-accent-2': '#673AB7', // Deep Purple
-                        'brand-hover': '#FFEB3B',   // Bright Yellow
-                        'brand-secondary': '#2A2A2A' // Slightly lighter dark for cards
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="min-h-screen flex flex-col bg-brand-bg text-brand-text transition-colors duration-500">
 
-    <header class="bg-brand-secondary/75 backdrop-filter backdrop-blur-lg shadow-lg shadow-black/20 fixed w-full z-50">
-        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="{% url 'home' %}" class="flex items-center space-x-4">
-                <div class="bg-brand-bg p-2 rounded-full shadow-md">
-                    <img src="{% static 'images/logo.png' %}" alt="NextGen Summit 2.0 Logo" class="w-8 h-8 rounded-full">                </div>
-                <span class="text-xl font-bold text-brand-text">NextGen Summit 2.0</span>
-            </a>
-            <div class="hidden md:flex space-x-6 items-center">
-                <a href="#about" class="hover:text-brand-hover font-medium transition duration-300">About</a>
-                <a href="#schedule" class="hover:text-brand-hover font-medium transition duration-300">Schedule</a>
-                <a href="#faq" class="hover:text-brand-hover font-medium transition duration-300">FAQs</a>
-                <a href="#" class="hover:text-brand-hover font-medium transition duration-300">Login</a>
-            </div>
-            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-full hover:bg-gray-700 transition duration-300">
-                <svg class="w-6 h-6 text-brand-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </nav>
-        <div id="mobile-menu" class="md:hidden hidden bg-brand-secondary/95 backdrop-blur-lg">
-            <a href="#about" class="block py-2 px-4 text-sm hover:bg-gray-700">About</a>
-            <a href="#schedule" class="block py-2 px-4 text-sm hover:bg-gray-700">Schedule</a>
-            <a href="#faq" class="block py-2 px-4 text-sm hover:bg-gray-700">FAQs</a>
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700">Login</a>
+{% block title %}Homepage - NextGen Summit 2.0{% endblock title %}
+
+{% block content %}
+<section class="container mx-auto px-4 py-8 md:py-16 text-center">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 text-gradient text-gradient-warm">
+        NEXTGEN SUMMIT 2.0
+    </h1>
+    <h2 class="text-xl md:text-3xl font-semibold mb-6 text-brand-text">
+        From Spark to Solution - Fuels the Future
+    </h2>
+    <p class="text-base md:text-lg max-w-3xl mx-auto mb-8 text-gray-300">
+        Join us for three power-packed days of innovation, learning, and creativity. This is your chance to build, innovate, and take your ideas to a national stage.
+    </p>
+    <a href="https://forms.gle/xvcWxYPqFemEhbC98" target="_blank" class="inline-block px-8 py-3 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition duration-300 shadow-xl transform hover:scale-105">
+        Register Now
+    </a>
+</section>
+
+<section class="bg-brand-secondary rounded-2xl p-8 mx-4 md:mx-auto max-w-4xl shadow-2xl my-16 text-center">
+    <h3 id="countdown-title" class="text-2xl md:text-3xl font-bold mb-6 text-brand-hover"></h3>
+    <div id="countdown" class="flex justify-center items-end space-x-2 md:space-x-8">
+    </div>
+</section>
+
+<section id="about" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
+        About The Event
+    </h3>
+    <p class="text-base md:text-lg max-w-4xl mx-auto text-gray-300 text-center">
+        We are back with three power-packed days of innovation, learning, and creativity! NextGen Summit 2.0, in collaboration with Microcare Academy and ITLU MEE, is designed to empower students with skills and opportunities. This event features a special talk by our proud alumnus, a Google-led workshop, a national-level hackathon, and a chance to get mentored for the Smart India Hackathon (SIH).
+    </p>
+</section>
+
+<section id="why-participate" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
+        Why Participate?
+    </h3>
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
+            <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Gain Skills</h4>
+            <p class="text-sm text-gray-300">Master AI tools in a workshop led by Google. Learn to brainstorm, prototype, and present innovative solutions.</p>
         </div>
-    </header>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
+            <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Network with Experts</h4>
+            <p class="text-sm text-gray-300">Connect with industry leaders from Oracle, Accenture, and Microcare Solutions. Get valuable feedback and insights.</p>
+        </div>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
+            <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Mentorship for SIH</h4>
+            <p class="text-sm text-gray-300">The best teams from our hackathon will be directly recommended and mentored for the National Level Smart India Hackathon (SIH).</p>
+        </div>
+    </div>
+</section>
 
-    <main class="flex-grow pt-24">
-        <section class="container mx-auto px-4 py-8 md:py-16 text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 text-gradient text-gradient-warm">
-                NEXTGEN SUMMIT 2.0
-            </h1>
-            <h2 class="text-xl md:text-3xl font-semibold mb-6 text-brand-text">
-                From Spark to Solution - Fuels the Future
-            </h2>
-            <p class="text-base md:text-lg max-w-3xl mx-auto mb-8 text-gray-300">
-                Join us for three power-packed days of innovation, learning, and creativity. This is your chance to build, innovate, and take your ideas to a national stage.
-            </p>
-            <a href="https://forms.gle/xvcWxYPqFemEhbC98" target="_blank" class="inline-block px-8 py-3 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition duration-300 shadow-xl transform hover:scale-105">
-                Register Now
-            </a>
-        </section>
-
-        <section class="bg-brand-secondary rounded-2xl p-8 mx-4 md:mx-auto max-w-4xl shadow-2xl my-16 text-center">
-            <h3 id="countdown-title" class="text-2xl md:text-3xl font-bold mb-6 text-brand-hover"></h3>
-            <div id="countdown" class="flex justify-center items-end space-x-2 md:space-x-8">
-            </div>
-        </section>
-
-        <section id="about" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
-                About The Event
-            </h3>
-            <p class="text-base md:text-lg max-w-4xl mx-auto text-gray-300 text-center">
-                We are back with three power-packed days of innovation, learning, and creativity! NextGen Summit 2.0, in collaboration with Microcare Academy and ITLU MEE, is designed to empower students with skills and opportunities. This event features a special talk by our proud alumnus, a Google-led workshop, a national-level hackathon, and a chance to get mentored for the Smart India Hackathon (SIH).
-            </p>
-        </section>
-
-        <section id="why-participate" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
-                Why Participate?
-            </h3>
-            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
-                    <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Gain Skills</h4>
-                    <p class="text-sm text-gray-300">Master AI tools in a workshop led by Google. Learn to brainstorm, prototype, and present innovative solutions.</p>
-                </div>
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
-                    <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Network with Experts</h4>
-                    <p class="text-sm text-gray-300">Connect with industry leaders from Oracle, Accenture, and Microcare Solutions. Get valuable feedback and insights.</p>
-                </div>
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl border-gradient">
-                    <h4 class="text-xl font-semibold mb-3 text-brand-accent-1">Mentorship for SIH</h4>
-                    <p class="text-sm text-gray-300">The best teams from our hackathon will be directly recommended and mentored for the National Level Smart India Hackathon (SIH).</p>
-                </div>
-            </div>
-        </section>
-        
-        <section id="schedule" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
-                Event Schedule
-            </h3>
-            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 1: Sep 25, 2025</h4>
-                    <ul class="space-y-4">
-                        {% for item in schedule_day1 %}
-                        <li class="p-3 bg-brand-bg rounded-lg">
-                            <span class="font-semibold text-sm text-brand-accent-1 block">
-                                {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
-                            </span>
-                            <p class="text-sm text-gray-300">{{ item.title }}</p>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 2: Sep 26, 2025</h4>
-                    <ul class="space-y-4">
-                        {% for item in schedule_day2 %}
-                        <li class="p-3 bg-brand-bg rounded-lg">
-                            <span class="font-semibold text-sm text-brand-accent-1 block">
-                                {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
-                            </span>
-                            <p class="text-sm text-gray-300">{{ item.title }}</p>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 3: Sep 27, 2025</h4>
-                    <ul class="space-y-4">
-                        {% for item in schedule_day3 %}
-                        <li class="p-3 bg-brand-bg rounded-lg">
-                            <span class="font-semibold text-sm text-brand-accent-1 block">
-                                {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
-                            </span>
-                            <p class="text-sm text-gray-300">{{ item.title }}</p>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section id="problem-statements" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
-                Problem Statements
-            </h3>
-            <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
-                <div class="space-y-6">
-                    {% for problem in problem_statements %}
-                        <div class="p-4 rounded-lg bg-brand-bg border-l-4 border-brand-accent-1">
-                            <h4 class="text-xl font-semibold text-brand-accent-1">{{ problem.title }}</h4>
-                            <p class="text-sm mt-2 text-gray-300">{{ problem.description }}</p>
-                        </div>
-                    {% empty %}
-                        <div class="text-center">
-                            <svg class="mx-auto w-16 h-16 text-brand-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            <p class="mt-2 text-sm text-gray-400">The vault is currently locked. Stay tuned for problem statements on Day 1!</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-        
-        <section id="faq" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
-                FAQs
-            </h3>
-            <div class="space-y-4 max-w-4xl mx-auto">
-                {% for faq in faqs %}
-                <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
-                    <h4 class="text-xl font-semibold mb-2 text-brand-accent-1">{{ faq.question }}</h4>
-                    <p class="text-sm text-gray-300">{{ faq.answer }}</p>
-                </div>
+<section id="schedule" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
+        Event Schedule
+    </h3>
+    <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 1: Sep 25, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day1 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
                 {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 2: Sep 26, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day2 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center text-brand-hover">Day 3: Sep 27, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day3 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="problem-statements" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
+        Problem Statements
+    </h3>
+    <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl max-w-4xl mx-auto">
+        <div class="space-y-6">
+            {% for problem in problem_statements %}
+                <div class="p-4 rounded-lg bg-brand-bg border-l-4 border-brand-accent-1">
+                    <h4 class="text-xl font-semibold text-brand-accent-1">{{ problem.title }}</h4>
+                    <p class="text-sm mt-2 text-gray-300">{{ problem.description }}</p>
+                </div>
+            {% empty %}
+                <div class="text-center">
+                    <svg class="mx-auto w-16 h-16 text-brand-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <p class="mt-2 text-sm text-gray-400">The vault is currently locked. Stay tuned for problem statements on Day 1!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="faq" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">
+        FAQs
+    </h3>
+    <div class="space-y-4 max-w-4xl mx-auto">
+        {% for faq in faqs %}
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-semibold mb-2 text-brand-accent-1">{{ faq.question }}</h4>
+            <p class="text-sm text-gray-300">{{ faq.answer }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section id="organizers-connects" class="container mx-auto px-4 py-8 md:py-16">
+    <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
+        Organized By & Connects
+    </h3>
+    <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl max-w-4xl mx-auto text-center">
+        <p class="text-lg font-semibold mb-4 text-brand-accent-1">Department of CSE & Students Programming Club</p>
+        <div class="flex flex-wrap justify-center items-center gap-6">
+            <div class="flex flex-col items-center"><img src="{% static 'images/microcare_logo.png' %}" alt="Microcare Academy Logo" class="rounded-full w-24 h-24 mb-2 border-2 border-brand-accent-1"><span class="text-sm font-medium">Microcare Academy</span></div>
+            <div class="flex flex-col items-center"><img src="{% static 'images/itlu_logo.png' %}" alt="ITLU MEE Logo" class="rounded-full w-24 h-24 mb-2 border-2 border-brand-hover"><span class="text-sm font-medium">ITLU MEE</span></div>
+        </div>
+        <div class="mt-8">
+            <p class="text-lg font-semibold">Venue: KVSR Auditorium, DRKVSRIT</p>
+            <a href="#" target="_blank" class="text-sm text-brand-accent-1 hover:text-brand-hover transition duration-300">View on Google Maps</a>
+        </div>
+        <div class="mt-8">
+            <div class="mt-8 flex justify-center space-x-6">
+                <a href="mailto:nexgen.summit2.o@gmail.com" target="_blank" aria-label="Gmail" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </a>
+                <a href="https://wa.me/9493569109" target="_blank" aria-label="WhatsApp" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/programmingclubcse?utm_source=qr&igsh=MXV3d3RxZTVvamhyZw==" target="_blank" aria-label="Instagram" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/your-profile" target="_blank" aria-label="LinkedIn" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </a>
             </div>
-        </section>
+        </div>
+    </div>
+</section>
+{% endblock content %}
 
-        <section id="organizers-connects" class="container mx-auto px-4 py-8 md:py-16">
-            <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-gradient text-gradient-warm">
-                Organized By & Connects
-            </h3>
-            <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl max-w-4xl mx-auto text-center">
-                <p class="text-lg font-semibold mb-4 text-brand-accent-1">Department of CSE & Students Programming Club</p>
-                <div class="flex flex-wrap justify-center items-center gap-6">
-                    <div class="flex flex-col items-center"><img src="{% static 'images/microcare_logo.png' %}" alt="Microcare Academy Logo" class="rounded-full w-24 h-24 mb-2 border-2 border-brand-accent-1"><span class="text-sm font-medium">Microcare Academy</span></div>
-                    <div class="flex flex-col items-center"><img src="{% static 'images/itlu_logo.png' %}" alt="ITLU MEE Logo" class="rounded-full w-24 h-24 mb-2 border-2 border-brand-hover"><span class="text-sm font-medium">ITLU MEE</span></div>
-                </div>
-                <div class="mt-8">
-                    <p class="text-lg font-semibold">Venue: KVSR Auditorium, DRKVSRIT</p>
-                    <a href="#" target="_blank" class="text-sm text-brand-accent-1 hover:text-brand-hover transition duration-300">View on Google Maps</a>
-                </div>
-                <div class="mt-8">
-                    <!-- Social Icons -->
-                    <div class="mt-8 flex justify-center space-x-6">
-                        <a href="mailto:nexgen.summit2.o@gmail.com" target="_blank" aria-label="Gmail" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
-                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                        </a>
-                        <a href="https://wa.me/9493569109" target="_blank" aria-label="WhatsApp" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
-                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                            </svg>
-                        </a>
-                        <a href="https://www.instagram.com/programmingclubcse/" target="_blank" aria-label="Instagram" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
-                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                            </svg>
-                        </a>
-                        <a href="https://www.linkedin.com/company/students-programming-club-of-cse/" target="_blank" aria-label="LinkedIn" class="social-link text-accent-coral hover:text-hover-orange transition duration-300">
-                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                                <rect x="2" y="9" width="4" height="12"></rect>
-                                <circle cx="4" cy="4" r="2"></circle>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-
+{% block scripts_extra %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-
-    // Countdown Logic
+    // Countdown Logic (This is specific to the homepage)
     const eventStartDate = new Date('September 25, 2025 09:00:00 GMT+0530').getTime();
     const eventEndDate = new Date('September 27, 2025 18:00:00 GMT+0530').getTime();
     
@@ -315,6 +234,4 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCountdown();
 });
 </script>
-
-</body>
-</html>
+{% endblock scripts_extra %}

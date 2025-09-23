@@ -1,10 +1,10 @@
-# summit_site/urls.py
-
 from django.contrib import admin
-from django.urls import path, include  # 1. Make sure 'include' is imported
+from django.urls import path, include
 
 urlpatterns = [
+    # Route for the Django admin panel
     path('admin/', admin.site.urls),
-    # 2. Add this line to include the URLs from your 'event' app
+    
+    # Include all URLs from the 'event' app for the main site
     path('', include('event.urls')),
 ]
