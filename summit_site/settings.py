@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6gp%_8=g-$@gxf*mue2jxyr_19m1)(!+&nx7_v^gp3(#-&ka^0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['nextgensummit2.pythonanywhere.com ']
 
 
 # Application definition
@@ -123,7 +123,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Add the line below to point to your global static folder
-STATICFILES_DIRS = [BASE_DIR / 'static'] # <-- 2. ADD THIS LINE
+STATICFILES_DIRS = [BASE_DIR / 'static'] 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
