@@ -1,0 +1,89 @@
+{% extends 'event/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-10">
+    <div class="grid lg:grid-cols-4 gap-8">
+        
+        <aside class="lg:col-span-1 bg-brand-secondary p-6 rounded-2xl self-start">
+            <h2 class="text-xl font-bold mb-4 text-brand-hover">Dashboard Menu</h2>
+
+            {# --- PARTICIPANT SIDEBAR --- #}
+            {% if request.user.userprofile.user_role == 'participant' %}
+            <nav class="space-y-2">
+                <a href="{% url 'participant_dashboard' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🏠</span> <span class="font-medium">Home</span>
+                </a>
+                <a href="{% url 'team_dashboard' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>👥</span> <span class="font-medium">My Team</span>
+                </a>
+                <a href="{% url 'submit_solution' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>📤</span> <span class="font-medium">Submit Solution</span>
+                </a>
+                <a href="{% url 'home' %}#problem-statements" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🎯</span> <span class="font-medium">Problem Statements</span>
+                </a>
+                <a href="{% url 'home' %}#schedule" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🗓️</span> <span class="font-medium">Schedule</span>
+                </a>
+                <a href="{% url 'participant_dashboard' %}#announcements" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>📢</span> <span class="font-medium">Announcements</span>
+                </a>
+                </a>
+                <a href="{% url 'view_certificate' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🏅</span>
+                    <span class="font-medium">My Certificate</span>
+                </a>
+                <a href="{% url 'feedback' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>📝</span> <span class="font-medium">Feedback</span>
+                </a>
+
+            </nav>
+            {% endif %}
+
+            {# --- JUDGE SIDEBAR --- #}
+            {% if request.user.userprofile.user_role == 'judge' %}
+            <nav class="space-y-2">
+                <a href="{% url 'judge_dashboard' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🏆</span> <span class="font-medium">Submissions</span>
+                </a>
+                <a href="{% url 'home' %}#schedule" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🗓️</span> <span class="font-medium">Schedule</span>
+                </a>
+                 <a href="{% url 'feedback' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>📝</span> <span class="font-medium">Feedback</span>
+                </a>
+            </nav>
+            {% endif %}
+
+            {# --- ORGANIZER SIDEBAR --- #}
+            {% if request.user.userprofile.user_role == 'organizer' %}
+            <nav class="space-y-2">
+                <a href="{% url 'organizer_dashboard' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>🏠</span> <span class="font-medium">Home</span>
+                </a>
+                <a href="{% url 'admin:event_submission_changelist' %}" target="_blank" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>⚙️</span> <span class="font-medium">Manage Submissions</span>
+                </a>
+                <a href="{% url 'admin:event_team_changelist' %}" target="_blank" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>⚙️</span> <span class="font-medium">Manage Teams</span>
+                </a>
+                <a href="{% url 'admin:auth_user_changelist' %}" target="_blank" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>⚙️</span> <span class="font-medium">Manage Users</span>
+                </a>
+                <a href="{% url 'admin:event_announcement_add' %}" target="_blank" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-brand-bg transition duration-200">
+                    <span>📢</span> <span class="font-medium">Post Announcement</span>
+                </a>
+            </nav>
+            {% endif %}
+
+        </aside>
+
+        <main class="lg:col-span-3">
+            {% block dashboard_content %}
+            {% endblock dashboard_content %}
+        </main>
+
+    </div>
+</div>
+{% endblock content %}

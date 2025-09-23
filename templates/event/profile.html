@@ -1,0 +1,61 @@
+{% extends 'event/base.html' %}
+
+{% block title %}My Profile{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">My Profile</h1>
+
+    {% if messages %}
+    <div class="max-w-7xl mx-auto mb-6">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-500/20 text-green-300 border border-green-500{% else %}bg-red-500/20 text-red-300 border border-red-500{% endif %}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-3 gap-10">
+        <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 text-brand-accent-1">Account Details</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4 text-brand-text">
+                    {{ user_form.as_p }}
+                </div>
+                <button type="submit" name="update_user" class="mt-6 w-full py-3 px-4 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+                    Update Account
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 text-brand-accent-1">Profile Details</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4 text-brand-text">
+                    {{ profile_form.as_p }}
+                </div>
+                <button type="submit" name="update_profile" class="mt-6 w-full py-3 px-4 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+                    Update Profile
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold mb-6 text-brand-accent-2">Change Password</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4 text-brand-text">
+                    {{ password_form.as_p }}
+                </div>
+                <button type="submit" name="change_password" class="mt-6 w-full py-3 px-4 bg-brand-accent-2 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+                    Change Password
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-400 mt-4">Forgot your password? Please contact an event organizer.</p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,10 +1,135 @@
-{% extends 'event/base.html' %}
+{% extends 'event/dashboard_base.html' %}
 
 {% block title %}Participant Dashboard{% endblock title %}
 
-{% block content %}
-<div class="container mx-auto px-4 py-16 text-center">
-    <h1 class="text-4xl font-bold text-gradient text-gradient-warm">Welcome, Participant!</h1>
-    <p class="mt-4 text-lg text-gray-300">This is your dashboard. Here you can manage your team and view submissions.</p>
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-2 text-brand-text">Welcome, {{ user.first_name|default:user.username }}!</h1>
+<p class="mb-8 text-gray-400">This is your main hub for the event. Good luck!</p>
+
+<div class="bg-brand-secondary rounded-2xl p-8 shadow-2xl mb-10 text-center">
+    <h3 id="submission-countdown-title" class="text-2xl md:text-3xl font-bold mb-6 text-brand-hover"></h3>
+    <div id="submission-countdown" class="flex justify-center items-end space-x-2 md:space-x-8">
+        </div>
 </div>
-{% endblock content %}
+
+<section id="problem-statements" class="mb-10">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Problem Statements</h2>
+    <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+        <div class="space-y-6">
+            {% for problem in problem_statements %}
+                <div class="p-4 rounded-lg bg-brand-bg border-l-4 border-brand-accent-1">
+                    <h4 class="text-xl font-semibold text-brand-accent-1">{{ problem.title }}</h4>
+                    <p class="text-sm mt-2 text-gray-300">{{ problem.description|linebreaksbr }}</p>
+                </div>
+            {% empty %}
+                <div class="text-center text-gray-400">Problem statements will be released soon.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="schedule" class="mb-10">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Full Event Schedule</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center">Day 1: Sep 25, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day1 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center">Day 2: Sep 26, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day2 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-bold mb-4 text-center">Day 3: Sep 27, 2025</h4>
+            <ul class="space-y-4">
+                {% for item in schedule_day3 %}
+                <li class="p-3 bg-brand-bg rounded-lg">
+                    <span class="font-semibold text-sm text-brand-accent-1 block">
+                        {% if item.time_display_override %}{{ item.time_display_override }}{% else %}{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}{% endif %}
+                    </span>
+                    <p class="text-sm text-gray-300">{{ item.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="announcements">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Latest Announcements</h2>
+    <div class="space-y-4">
+    {% for announcement in announcements %}
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-semibold mb-2 text-brand-accent-1">{{ announcement.title }}</h4>
+            <p class="text-sm text-gray-300">{{ announcement.message|linebreaksbr }}</p>
+            <p class="text-xs text-gray-500 mt-3">{{ announcement.created_at|date:"F j, Y, P" }}</p>
+        </div>
+    {% empty %}
+         <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl text-center">
+            <p class="text-gray-400">No announcements yet.</p>
+        </div>
+    {% endfor %}
+    </div>
+</section>
+{% endblock dashboard_content %}
+
+
+{% block scripts_extra %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Submission Countdown Logic ---
+    const submissionEndDate = new Date('September 27, 2025 12:00:00 GMT+0530').getTime();
+    
+    const countdownEl = document.getElementById('submission-countdown');
+    const countdownTitleEl = document.getElementById('submission-countdown-title');
+    
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const timeLeft = submissionEndDate - now;
+        
+        countdownTitleEl.textContent = 'Solution Submission Ends In';
+
+        if (timeLeft > 0) {
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            countdownEl.innerHTML = `
+                <div class="flex flex-col items-center w-16"><span class="text-3xl md:text-5xl font-extrabold text-brand-text">${String(days).padStart(2, '0')}</span><span class="text-xs md:text-sm text-gray-400">Days</span></div>
+                <span class="text-3xl md:text-5xl text-brand-text">:</span>
+                <div class="flex flex-col items-center w-16"><span class="text-3xl md:text-5xl font-extrabold text-brand-text">${String(hours).padStart(2, '0')}</span><span class="text-xs md:text-sm text-gray-400">Hours</span></div>
+                <span class="text-3xl md:text-5xl text-brand-text">:</span>
+                <div class="flex flex-col items-center w-16"><span class="text-3xl md:text-5xl font-extrabold text-brand-text">${String(minutes).padStart(2, '0')}</span><span class="text-xs md:text-sm text-gray-400">Minutes</span></div>
+                <span class="text-3xl md:text-5xl text-brand-text">:</span>
+                <div class="flex flex-col items-center w-16"><span class="text-3xl md:text-5xl font-extrabold text-brand-text">${String(seconds).padStart(2, '0')}</span><span class="text-xs md:text-sm text-gray-400">Seconds</span></div>
+            `;
+        } else {
+            countdownTitleEl.textContent = 'Submission Deadline Has Passed';
+            countdownEl.innerHTML = '';
+        }
+    };
+    
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+});
+</script>
+{% endblock scripts_extra %}

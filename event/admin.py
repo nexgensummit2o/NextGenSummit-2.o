@@ -1,26 +1,37 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from . import models
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'email')
+
 # --- User Admin Configuration ---
-# This allows the UserProfile to be edited directly within the User's admin page.
 class UserProfileInline(admin.StackedInline):
     model = models.UserProfile
     can_delete = False
     verbose_name_plural = 'User Profile'
 
-# Define a new User admin by extending the base and adding the inline
 class UserAdmin(BaseUserAdmin):
+    add_form = CustomUserCreationForm
     inlines = (UserProfileInline,)
+    
+    # This is the corrected layout for the "Add user" page
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2'), # Corrected password21 to password1
+        }),
+    )
 
-# Unregister the default User admin and re-register it with our custom one
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
 # --- Schedule Admin Configuration ---
-# This allows editing ScheduleDetail directly within the ScheduleItem admin page
 class ScheduleDetailInline(admin.StackedInline):
     model = models.ScheduleDetail
     can_delete = False
@@ -47,7 +58,6 @@ class SubmissionAdmin(admin.ModelAdmin):
 
 
 # --- Register All Other Models ---
-# This makes the rest of your models accessible in the admin panel
 admin.site.register(models.ProblemStatement)
 admin.site.register(models.Organizer)
 admin.site.register(models.FAQ)

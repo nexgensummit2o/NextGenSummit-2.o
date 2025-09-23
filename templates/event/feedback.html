@@ -1,0 +1,20 @@
+{% extends 'event/dashboard_base.html' %}
+
+{% block title %}Submit Feedback{% endblock title %}
+
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6 text-brand-text">Submit Feedback</h1>
+<p class="mb-6 text-gray-400">We value your opinion. Please let us know how we did.</p>
+
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-4 text-brand-text">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="mt-6 w-full py-3 px-4 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+            Submit Feedback
+        </button>
+    </form>
+</div>
+{% endblock dashboard_content %}

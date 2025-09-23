@@ -1,0 +1,36 @@
+# --- Virtual Environment ---
+# Ignore the virtual environment folder
+/myvenv/
+/venv/
+
+# --- Django ---
+# Ignore database files
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+
+# Ignore log files
+*.log
+
+# --- Python ---
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# --- Media Files ---
+# Ignore user-uploaded files
+/media/
+
+# --- Editor & OS Files ---
+# Ignore IDE-specific settings
+.vscode/
+.idea/
+
+# Ignore macOS and Windows system files
+.DS_Store
+Thumbs.db
+
+# --- Environment Variables ---
+# Ignore files containing secret keys and passwords
+.env
+*.env

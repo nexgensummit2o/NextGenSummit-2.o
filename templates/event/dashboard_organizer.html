@@ -1,10 +1,55 @@
-{% extends 'event/base.html' %}
+{% extends 'event/dashboard_base.html' %}
 
-{% block title %}Participant Dashboard{% endblock title %}
+{% block title %}Organizer Dashboard{% endblock title %}
 
-{% block content %}
-<div class="container mx-auto px-4 py-16 text-center">
-    <h1 class="text-4xl font-bold text-gradient text-gradient-warm">Welcome, Participant!</h1>
-    <p class="mt-4 text-lg text-gray-300">This is your dashboard. Here you can manage your team and view submissions.</p>
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6 text-brand-text">Organizer Dashboard</h1>
+
+<div class="grid md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-400">Total Participants</h3>
+        <p class="text-4xl font-bold text-brand-accent-1 mt-2">{{ participant_count }}</p>
+    </div>
+    <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-400">Teams Formed</h3>
+        <p class="text-4xl font-bold text-brand-accent-2 mt-2">{{ team_count }}</p>
+    </div>
+    <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+        <h3 class="text-lg font-semibold text-gray-400">Projects Submitted</h3>
+        <p class="text-4xl font-bold text-brand-hover mt-2">{{ submission_count }}</p>
+    </div>
 </div>
-{% endblock content %}
+
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl mb-10">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Recent Submissions</h2>
+    {% if recent_submissions %}
+    <ul class="space-y-3">
+        {% for submission in recent_submissions %}
+        <li class="flex items-center justify-between p-3 bg-brand-bg rounded-lg">
+            <div>
+                <span class="font-medium">{{ submission.project_title }}</span>
+                <span class="text-sm text-gray-400"> by {{ submission.team.team_name }}</span>
+            </div>
+            <span class="text-xs text-gray-500">{{ submission.submitted_at|timesince }} ago</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-400">No projects have been submitted yet.</p>
+    {% endif %}
+</div>
+
+{% if announcements %}
+    <h2 id="announcements" class="text-2xl font-bold mb-4 text-brand-hover">Latest Announcements</h2>
+    <div class="space-y-4">
+    {% for announcement in announcements %}
+        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
+            <h4 class="text-xl font-semibold mb-2 text-brand-accent-1">{{ announcement.title }}</h4>
+            <p class="text-sm text-gray-300">{{ announcement.message|linebreaksbr }}</p>
+            <p class="text-xs text-gray-500 mt-3">{{ announcement.created_at|date:"F j, Y, P" }}</p>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock dashboard_content %}

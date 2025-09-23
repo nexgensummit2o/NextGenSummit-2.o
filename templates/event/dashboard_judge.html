@@ -1,10 +1,40 @@
-{% extends 'event/base.html' %}
+{% extends 'event/dashboard_base.html' %}
 
-{% block title %}Participant Dashboard{% endblock title %}
+{% block title %}Judge Dashboard{% endblock title %}
 
-{% block content %}
-<div class="container mx-auto px-4 py-16 text-center">
-    <h1 class="text-4xl font-bold text-gradient text-gradient-warm">Welcome, Participant!</h1>
-    <p class="mt-4 text-lg text-gray-300">This is your dashboard. Here you can manage your team and view submissions.</p>
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6 text-brand-text">Submissions for Judging</h1>
+
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b border-gray-600">
+                    <th class="py-3 pr-3">Project Title</th>
+                    <th class="py-3 pr-3">Team Name</th>
+                    <th class="py-3 pr-3">Problem Statement</th>
+                    <th class="py-3 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for submission in submissions %}
+                <tr class="border-b border-gray-700">
+                    <td class="py-4 pr-3 font-semibold">{{ submission.project_title }}</td>
+                    <td class="py-4 pr-3 text-gray-300">{{ submission.team.team_name }}</td>
+                    <td class="py-4 pr-3 text-gray-400">{{ submission.problem_statement.title|truncatewords:5 }}</td>
+                    <td class="py-4 text-right">
+                        <a href="{% url 'score_submission' submission.id %}" class="px-4 py-2 bg-brand-accent-1 text-white font-semibold rounded-lg hover:bg-brand-hover hover:text-black">
+                            Score
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="py-8 text-center text-gray-400">No projects have been submitted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endblock content %}
+{% endblock dashboard_content %}

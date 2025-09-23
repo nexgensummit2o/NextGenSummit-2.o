@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'event.context_processors.unread_notifications_count',
             ],
         },
     },
@@ -123,6 +124,9 @@ STATIC_URL = 'static/'
 
 # Add the line below to point to your global static folder
 STATICFILES_DIRS = [BASE_DIR / 'static'] # <-- 2. ADD THIS LINE
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

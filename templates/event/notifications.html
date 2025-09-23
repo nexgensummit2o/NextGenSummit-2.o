@@ -1,0 +1,22 @@
+{% extends 'event/base.html' %}
+
+{% block title %}My Notifications{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold text-center mb-10 text-gradient text-gradient-warm">My Notifications</h1>
+
+    <div class="max-w-4xl mx-auto space-y-4">
+        {% for notification in notifications %}
+        <div class="p-6 rounded-2xl shadow-xl {% if not notification.is_read %}bg-brand-secondary border-l-4 border-brand-hover{% else %}bg-brand-bg opacity-70{% endif %}">
+            <p class="text-brand-text">{{ notification.message }}</p>
+            <p class="text-xs text-gray-500 mt-2">{{ notification.created_at|date:"F j, Y, P" }}</p>
+        </div>
+        {% empty %}
+        <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl text-center">
+            <p class="text-gray-400">You have no notifications.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

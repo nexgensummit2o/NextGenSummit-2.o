@@ -1,0 +1,29 @@
+{% extends 'event/dashboard_base.html' %}
+
+{% block title %}My Certificate{% endblock title %}
+
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6 text-brand-text">My Certificate</h1>
+
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl text-center">
+    {% if certificate %}
+        {% if is_unlocked %}
+            <h2 class="text-2xl font-bold mb-4 text-brand-hover">Congratulations!</h2>
+            <p class="mb-6 text-gray-300">Here is your certificate of participation.</p>
+            <div class="mb-6">
+                <img src="{{ certificate.certificate_file.url }}" alt="Your Certificate" class="rounded-lg shadow-lg mx-auto">
+            </div>
+            <a href="{{ certificate.certificate_file.url }}" download class="inline-block w-full py-3 px-4 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+                Download Certificate
+            </a>
+        {% else %}
+            <h2 class="text-2xl font-bold mb-4 text-green-400">Certificate Generated!</h2>
+            <p class="text-gray-300">Your certificate is ready and will be unlocked on:</p>
+            <p class="text-xl font-bold text-brand-hover mt-2">{{ unlock_time|date:"F j, Y, P" }}</p>
+        {% endif %}
+    {% else %}
+        <h2 class="text-2xl font-bold mb-4 text-brand-hover">Almost there!</h2>
+        <p class="text-gray-300">Your certificate will be generated automatically after your team leader submits your project.</p>
+    {% endif %}
+</div>
+{% endblock dashboard_content %}

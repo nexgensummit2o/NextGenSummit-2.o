@@ -1,0 +1,39 @@
+{% extends 'event/dashboard_base.html' %}
+
+{% block title %}Team Dashboard{% endblock title %}
+
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6 text-brand-text">Join or Create a Team</h1>
+
+{% if invites %}
+<div class="mb-10">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Pending Invitations</h2>
+    <div class="space-y-4">
+        {% for invite in invites %}
+        <div class="bg-brand-secondary p-6 rounded-2xl flex justify-between items-center">
+            <div>
+                <p class="font-semibold">You have an invitation to join <span class="text-brand-accent-1">{{ invite.team.team_name }}</span></p>
+                <p class="text-sm text-gray-400">Invited by: {{ invite.team.leader.username }}</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="{% url 'handle_invite' invite.id 'accept' %}" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500">Accept</a>
+                <a href="{% url 'handle_invite' invite.id 'decline' %}" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-500">Decline</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="bg-brand-secondary p-8 rounded-2xl">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Create a New Team</h2>
+    <p class="mb-4 text-gray-400">You are not currently on a team. Create one to get started!</p>
+    <form action="{% url 'create_team' %}" method="post">
+        {% csrf_token %}
+        {{ creation_form.as_p }}
+        <button type="submit" class="mt-4 w-full py-3 px-4 bg-brand-accent-1 text-white font-semibold rounded-full hover:bg-brand-hover hover:text-black transition">
+            Create Team
+        </button>
+    </form>
+</div>
+{% endblock dashboard_content %}

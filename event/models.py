@@ -191,3 +191,11 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}"
+
+class Certificate(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    certificate_file = models.FileField(upload_to='certificates/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Certificate for {self.user.username}"
