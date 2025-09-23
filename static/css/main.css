@@ -1,0 +1,19 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+.text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.text-gradient-warm {
+    background-image: linear-gradient(to right, #FF5722, #FFEB3B);
+}
+.border-gradient {
+    border-image: linear-gradient(to right, #FF5722, #FFEB3B) 1;
+    border-width: 2px;
+    border-style: solid;
+}
+.social-link:hover svg {
+    fill: currentColor;
+}
