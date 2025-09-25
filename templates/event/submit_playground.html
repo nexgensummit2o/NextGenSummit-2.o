@@ -1,64 +1,74 @@
 {% extends 'event/dashboard_base.html' %}
-{% block title %}Submission Playground{% endblock %}
+
+{% block title %}Submission Playground{% endblock title %}
 
 {% block dashboard_content %}
 <h1 class="text-3xl font-bold mb-6">Submission Playground</h1>
+<p class="mb-8 text-gray-400">Follow these steps to complete your project submission. You can save your progress at any time.</p>
 
 <div class="space-y-8">
-    <div class="bg-brand-secondary p-6 rounded-2xl">
+    <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
         <h2 class="text-2xl font-bold flex items-center gap-3">
-            {% if team.selected_problem %}✔️{% else %}1️⃣{% endif %} Select Problem Statement
+            {% if team.selected_problem %}<span class="text-green-400">✔️</span>{% else %}1️⃣{% endif %} Select Problem Statement
         </h2>
         {% if team.selected_problem %}
             <p class="mt-2 text-green-400">Completed. You selected: <span class="font-bold">{{ team.selected_problem.title }}</span></p>
         {% else %}
-            <p class="mt-2 text-yellow-400">Your team leader must select one problem. You cannot change it later.</p>
+            <p class="mt-2 text-yellow-400"><b>Action Required:</b> Your team leader must select one problem. This choice is final.</p>
             {% if user == team.leader %}
             <div class="mt-4 space-y-3">
                 {% for problem in available_problems %}
                 <div class="bg-brand-bg p-4 rounded-lg flex justify-between items-center">
                     <p>{{ problem.title }}</p>
-                    <a href="{% url 'select_problem' problem.id %}" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg">Select</a>
+                    <a href="{% url 'select_problem' problem.id %}" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 whitespace-nowrap">
+                        Select
+                    </a>
                 </div>
+                {% empty %}
+                <p class="text-gray-500">All problem statements have been taken. Please contact an organizer.</p>
                 {% endfor %}
             </div>
             {% endif %}
         {% endif %}
     </div>
 
-    <div class="bg-brand-secondary p-6 rounded-2xl {% if not team.selected_problem %}opacity-50{% endif %}">
-        <h2 class="text-2xl font-bold">
-            {% if submission.ideation_text %}✔️{% else %}2️⃣{% endif %} Submit Your Ideation & Plan
+    <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl {% if not team.selected_problem %}opacity-50 pointer-events-none{% endif %}">
+        <h2 class="text-2xl font-bold flex items-center gap-3">
+            {% if submission.ideation_text and submission.plan_pdf and submission.repo_link %}
+                <span class="text-green-400">✔️</span>
+            {% else %}
+                2️⃣
+            {% endif %}
+             Submit Your Work
         </h2>
-        {% if team.selected_problem %}
-        <form method="post" enctype="multipart/form-data">
+        
+        <form method="post" enctype="multipart/form-data" class="mt-4">
             {% csrf_token %}
-            <div class="mt-4 space-y-4">
+            <div class="space-y-6">
                 <div>
-                    <label class="font-semibold">{{ form.ideation_text.label }}</label>
+                    <label class="font-semibold text-lg flex items-center gap-2">{% if submission.ideation_text %}✔️{% endif %} {{ form.ideation_text.label }}</label>
                     {{ form.ideation_text }}
                 </div>
                 <div>
-                    <label class="font-semibold">{{ form.plan_pdf.label }}</label>
+                    <label class="font-semibold text-lg flex items-center gap-2">{% if submission.plan_pdf %}✔️{% endif %} {{ form.plan_pdf.label }}</label>
                     {% if submission.plan_pdf %}
-                        <p class="text-sm text-gray-400">Current file: <a href="{{ submission.plan_pdf.url }}" target="_blank" class="underline">{{ submission.plan_pdf.name }}</a></p>
+                        <p class="text-sm text-gray-400 mt-1">Current file: <a href="{{ submission.plan_pdf.url }}" target="_blank" class="underline hover:text-brand-hover">{{ submission.plan_pdf.name }}</a></p>
                     {% endif %}
                     {{ form.plan_pdf }}
                 </div>
-                 <div>
-                    <label class="font-semibold">{{ form.repo_link.label }}</label>
+                <div>
+                    <label class="font-semibold text-lg flex items-center gap-2">{% if submission.repo_link %}✔️{% endif %} {{ form.repo_link.label }}</label>
                     {{ form.repo_link }}
                 </div>
-                 <div>
-                    <label class="font-semibold">{{ form.demo_link.label }}</label>
+                <div>
+                    <label class="font-semibold text-lg flex items-center gap-2">{% if submission.demo_link %}✔️{% endif %} {{ form.demo_link.label }}</label>
                     {{ form.demo_link }}
                 </div>
             </div>
-            <button type="submit" class="mt-6 py-2 px-6 bg-brand-accent-1 rounded-lg">Save Playground</button>
+            <button type="submit" class="mt-8 py-3 px-6 bg-brand-accent-1 text-white font-bold rounded-lg hover:bg-brand-hover hover:text-black transition">
+                Save Progress
+            </button>
         </form>
-        {% else %}
-        <p class="mt-2 text-gray-500">You must select a problem statement first.</p>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

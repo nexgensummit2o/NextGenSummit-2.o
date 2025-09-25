@@ -6,9 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6gp%_8=g-$@gxf*mue2jxyr_19m1)(!+&nx7_v^gp3(#-&ka^0' # IMPORTANT: Keep this secret
 
 # Set DEBUG to False for production
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['nextgensummit2.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,10 +54,11 @@ WSGI_APPLICATION = 'summit_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'nextgensummit2$nextgen_summit_db',
-        'USER': 'nextgensummit2',
-        'PASSWORD': '653nHKfcAu_Zs8E', # IMPORTANT: Keep this secret
-        'HOST': 'nextgensummit2.mysql.pythonanywhere-services.com',
+        'NAME': 'NextGenSummitDB',
+        'USER': 'root',
+        'PASSWORD': '7386104491', # IMPORTANT: Keep this secret
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 

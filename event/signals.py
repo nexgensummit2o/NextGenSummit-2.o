@@ -67,20 +67,6 @@ def create_certificates_for_team(sender, instance, created, **kwargs):
                 except Exception as e:
                     print(f"An error occurred during certificate generation: {e}")
 
-@receiver(post_save, sender=UserProfile)
-def manage_staff_status(sender, instance, created, **kwargs):
-    """
-    Grant or revoke staff status when a user's role changes to/from 'organizer'.
-    """
-    user = instance.user
-    if instance.user_role == 'organizer':
-        if not user.is_staff:
-            user.is_staff = True
-            user.save()
-    else:
-        if user.is_staff and not user.is_superuser:
-            user.is_staff = False
-            user.save()
 
 @receiver(post_save, sender=TeamMember)
 def notify_on_team_member_status_change(sender, instance, created, **kwargs):

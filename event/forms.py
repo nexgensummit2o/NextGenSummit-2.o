@@ -96,9 +96,6 @@ class TeamInviteForm(forms.Form):
     )
 
 class SubmissionPlaygroundForm(forms.ModelForm):
-    """
-    Form for the multi-step submission playground.
-    """
     class Meta:
         model = Submission
         fields = ['ideation_text', 'plan_pdf', 'repo_link', 'demo_link']

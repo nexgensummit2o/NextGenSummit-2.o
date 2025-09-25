@@ -279,8 +279,9 @@ def submit_playground(request):
     except TeamMember.DoesNotExist:
         messages.error(request, "You must be on a team to access the playground.")
         return redirect('participant_dashboard')
-
+    
     submission, created = Submission.objects.get_or_create(team=team, defaults={'problem_statement': team.selected_problem})
+
     if request.method == 'POST':
         form = SubmissionPlaygroundForm(request.POST, request.FILES, instance=submission)
         if form.is_valid():
@@ -289,13 +290,13 @@ def submit_playground(request):
             return redirect('submit_playground')
     else:
         form = SubmissionPlaygroundForm(instance=submission)
-
+        
     available_problems = ProblemStatement.objects.annotate(team_count=Count('teams_working_on')).filter(team_count__lt=3)
     context = {
         'team': team,
         'submission': submission,
         'form': form,
-        'available_problems': available_problems,
+        #'available_problems': available_problems,
         'role': get_user_role(request.user),
     }
     return render(request, 'event/submit_playground.html', context)
