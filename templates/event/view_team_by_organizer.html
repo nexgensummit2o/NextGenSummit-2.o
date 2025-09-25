@@ -1,0 +1,24 @@
+{% extends 'event/dashboard_base.html' %}
+
+{% block title %}View Team - {{ team.team_name }}{% endblock title %}
+
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold text-brand-text">Team: {{ team.team_name }}</h1>
+<p class="text-gray-400">Led by: {{ team.leader.username }}</p>
+
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl mt-6">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Members</h2>
+    <ul class="space-y-3">
+    {% for member in team.teammember_set.all %}
+        <li class="flex items-center justify-between p-3 bg-brand-bg rounded-lg">
+            <span class="font-medium">{{ member.participant.username }}</span>
+             {% if member.role == 'leader' %}
+            <span class="text-xs font-bold bg-brand-accent-2 text-white px-2 py-1 rounded-full">LEADER</span>
+            {% else %}
+            <span class="text-xs font-bold bg-gray-600 text-gray-200 px-2 py-1 rounded-full">MEMBER</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock dashboard_content %}

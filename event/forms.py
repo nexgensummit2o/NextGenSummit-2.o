@@ -1,24 +1,25 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
-from .models import UserProfile
-from .models import Feedback 
-from .models import Team
-from .models import Submission
-from .models import JudgingScore
+from .models import (
+    UserProfile, Feedback, Team, Submission, JudgingScore
+)
 
 class CustomPasswordChangeForm(PasswordChangeForm):
+    """
+    A custom password change form that removes the default help text and adds styling.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Remove the help text from the new password field
         self.fields['new_password1'].help_text = None
-        # Optional: Add styling to match other forms
         self.fields['old_password'].widget.attrs.update({'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'})
         self.fields['new_password1'].widget.attrs.update({'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'})
         self.fields['new_password2'].widget.attrs.update({'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'})
 
-
 class UserUpdateForm(forms.ModelForm):
+    """
+    Form for updating the User model's first_name, last_name, and email.
+    """
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'})
     )
@@ -31,19 +32,25 @@ class UserUpdateForm(forms.ModelForm):
         }
 
 class UserProfileForm(forms.ModelForm):
+    """
+    Form for updating the custom UserProfile model's details.
+    """
     class Meta:
         model = UserProfile
         fields = ['student_roll_number', 'about', 'branch', 'year_of_study', 'linkedin', 'github']
         widgets = {
-            'student_roll_number': forms.TextInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'}),
-            'about': forms.Textarea(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1', 'rows': 4}),
-            'branch': forms.TextInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'}),
-            'year_of_study': forms.NumberInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'}),
-            'linkedin': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'}),
-            'github': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text focus:outline-none focus:ring-brand-accent-1 focus:border-brand-accent-1'}),
+            'student_roll_number': forms.TextInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
+            'about': forms.Textarea(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text', 'rows': 4}),
+            'branch': forms.TextInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
+            'year_of_study': forms.NumberInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
+            'linkedin': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
+            'github': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
         }
 
 class FeedbackForm(forms.ModelForm):
+    """
+    Form for users to submit event feedback.
+    """
     class Meta:
         model = Feedback
         fields = ['rating', 'comments']
@@ -61,8 +68,10 @@ class FeedbackForm(forms.ModelForm):
             'comments': 'Your Comments',
         }
 
-# Add these two new forms at the end of the file
 class TeamCreationForm(forms.ModelForm):
+    """
+    Form for creating a new team.
+    """
     class Meta:
         model = Team
         fields = ['team_name']
@@ -72,11 +81,12 @@ class TeamCreationForm(forms.ModelForm):
                 'placeholder': 'Enter your team name'
             }),
         }
-        labels = {
-            'team_name': ''
-        }
+        labels = { 'team_name': '' }
 
 class TeamInviteForm(forms.Form):
+    """
+    A simple form for inviting a user by email.
+    """
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
             'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text',
@@ -85,35 +95,37 @@ class TeamInviteForm(forms.Form):
         label=""
     )
 
-class SubmissionForm(forms.ModelForm):
+class SubmissionPlaygroundForm(forms.ModelForm):
+    """
+    Form for the multi-step submission playground.
+    """
     class Meta:
         model = Submission
-        fields = ['problem_statement', 'project_title', 'project_description', 'repo_link', 'demo_link']
+        fields = ['ideation_text', 'plan_pdf', 'repo_link', 'demo_link']
         widgets = {
-            'problem_statement': forms.Select(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
-            'project_title': forms.TextInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
-            'project_description': forms.Textarea(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text', 'rows': 5}),
-            'repo_link': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text', 'placeholder': 'https://github.com/user/repo'}),
-            'demo_link': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text', 'placeholder': 'https://youtu.be/...'}),
+            'ideation_text': forms.Textarea(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text', 'rows': 6}),
+            'plan_pdf': forms.FileInput(attrs={'class': 'mt-1 block w-full text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-accent-2 file:text-white hover:file:bg-purple-600'}),
+            'repo_link': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
+            'demo_link': forms.URLInput(attrs={'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text'}),
         }
         labels = {
-            'problem_statement': 'Chosen Problem Statement',
-            'project_title': 'Project Title',
-            'project_description': 'A brief description of your project',
-            'repo_link': 'GitHub Repository Link',
-            'demo_link': 'Project Demo Link (YouTube, Loom, etc.)',
+            'ideation_text': 'Your Ideation',
+            'plan_pdf': 'Implementation Plan (PDF only)',
+            'repo_link': 'Prototype/GitHub Link',
+            'demo_link': 'Video Demo Link'
         }
 
 class JudgingScoreForm(forms.ModelForm):
+    """
+    Form for judges to submit a score and feedback.
+    """
     class Meta:
         model = JudgingScore
         fields = ['score', 'feedback']
         widgets = {
             'score': forms.NumberInput(attrs={
                 'class': 'mt-1 block w-full bg-brand-bg border-gray-600 rounded-md py-2 px-3 text-brand-text',
-                'min': 0,
-                'max': 100,
-                'step': 0.5
+                'min': 0, 'max': 100, 'step': 0.5
             }),
             'feedback': forms.Textarea(
                 attrs={

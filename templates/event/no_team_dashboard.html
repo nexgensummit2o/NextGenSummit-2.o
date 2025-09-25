@@ -27,7 +27,7 @@
 
 <div class="bg-brand-secondary p-8 rounded-2xl">
     <h2 class="text-2xl font-bold mb-4 text-brand-hover">Create a New Team</h2>
-    <p class="mb-4 text-gray-400">You are not currently on a team. Create one to get started!</p>
+    <p class="mb-4 text-gray-400">You are not currently on a team. Create one to get started, or <a href="{% url 'team_list' %}" class="text-brand-accent-1 underline hover:text-brand-hover">browse existing teams</a>.</p>
     <form action="{% url 'create_team' %}" method="post">
         {% csrf_token %}
         {{ creation_form.as_p }}

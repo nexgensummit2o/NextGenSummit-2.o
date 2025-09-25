@@ -41,7 +41,7 @@
                 <span class="text-xl font-bold text-brand-text">NextGen Summit 2.0</span>
             </a>
             <div class="hidden md:flex space-x-6 items-center">
-                
+
                 {% if user.is_authenticated %}
                     {% if user.userprofile.user_role == 'participant' %}
                         <a href="{% url 'participant_dashboard' %}" class="hover:text-brand-hover font-medium transition duration-300">Dashboard</a>
@@ -50,12 +50,12 @@
                     {% elif user.userprofile.user_role == 'organizer' %}
                         <a href="{% url 'organizer_dashboard' %}" class="hover:text-brand-hover font-medium transition duration-300">Dashboard</a>
                     {% endif %}
-                    
+
                     <form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
                         <button type="submit" class="hover:text-brand-hover font-medium transition duration-300">Logout</button>
                     </form>
-                    
+
                     <div class="h-6 w-px bg-gray-600"></div>
 
                     <div class="flex items-center space-x-2">
@@ -106,6 +106,7 @@
                 <a href="{% url 'home' %}#about" class="block py-2 px-4 text-sm hover:bg-gray-700">About</a>
                 <a href="{% url 'home' %}#schedule" class="block py-2 px-4 text-sm hover:bg-gray-700">Schedule</a>
                 <a href="{% url 'home' %}#faq" class="block py-2 px-4 text-sm hover:bg-gray-700">FAQs</a>
+                <a href="{% url 'home' %}#organizers-connects" class="hover:text-brand-hover font-medium transition duration-300">Contact Us</a>
                 <a href="{% url 'login' %}" class="block py-2 px-4 text-sm hover:bg-gray-700">Login</a>
             {% endif %}
         </div>
@@ -117,8 +118,8 @@
 
     <footer class="bg-brand-secondary/75 backdrop-filter backdrop-blur-lg shadow-inner mt-auto">
         <div class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
-            <p>© 2025 NextGen Summit. All rights reserved.</p>
-            <p class="mt-1">Designed and developed by <a href="https://www.linkedin.com/in/bharath-telugu/" class="text-brand-accent-1 hover:text-brand-hover transition duration-300" target="_blank">Bharath Telugu</a></p>
+            <p>© 2025 NextGen Summit by Students Programming Club. All rights reserved.</p>
+            <p class="mt-1">Designed and developed by <a href="https://www.linkedin.com/in/bharathtelugu-ck" class="text-brand-accent-1 hover:text-brand-hover transition duration-300" target="_blank">Bharath Telugu</a></p>
         </div>
     </footer>
 

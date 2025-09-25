@@ -3,7 +3,7 @@
 {% block title %}Organizer Dashboard{% endblock title %}
 
 {% block dashboard_content %}
-<h1 class="text-3xl font-bold mb-6 text-brand-text">Organizer Dashboard</h1>
+<h1 class="text-3xl font-bold mb-6 text-brand-text">Organizer Control Panel</h1>
 
 <div class="grid md:grid-cols-3 gap-6 mb-10">
     <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
@@ -21,35 +21,62 @@
 </div>
 
 <div class="bg-brand-secondary p-8 rounded-2xl shadow-xl mb-10">
-    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Recent Submissions</h2>
-    {% if recent_submissions %}
-    <ul class="space-y-3">
-        {% for submission in recent_submissions %}
-        <li class="flex items-center justify-between p-3 bg-brand-bg rounded-lg">
-            <div>
-                <span class="font-medium">{{ submission.project_title }}</span>
-                <span class="text-sm text-gray-400"> by {{ submission.team.team_name }}</span>
-            </div>
-            <span class="text-xs text-gray-500">{{ submission.submitted_at|timesince }} ago</span>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="text-gray-400">No projects have been submitted yet.</p>
-    {% endif %}
+    <h2 class="text-2xl font-bold mb-6 text-brand-hover">Quick Actions</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <a href="{% url 'admin:event_announcement_add' %}" target="_blank" class="p-4 bg-brand-bg rounded-lg hover:scale-105 transition-transform">
+            <span class="text-4xl">📢</span>
+            <span class="block mt-2 font-semibold">Post Announcement</span>
+        </a>
+        <a href="{% url 'admin:event_submission_changelist' %}" target="_blank" class="p-4 bg-brand-bg rounded-lg hover:scale-105 transition-transform">
+            <span class="text-4xl">🏆</span>
+            <span class="block mt-2 font-semibold">View Submissions</span>
+        </a>
+        <a href="{% url 'admin:event_team_changelist' %}" target="_blank" class="p-4 bg-brand-bg rounded-lg hover:scale-105 transition-transform">
+            <span class="text-4xl">👥</span>
+            <span class="block mt-2 font-semibold">View Teams</span>
+        </a>
+         <a href="{% url 'admin:event_judgingscore_changelist' %}" target="_blank" class="p-4 bg-brand-bg rounded-lg hover:scale-105 transition-transform">
+            <span class="text-4xl">💯</span>
+            <span class="block mt-2 font-semibold">View Scores</span>
+        </a>
+    </div>
 </div>
 
-{% if announcements %}
-    <h2 id="announcements" class="text-2xl font-bold mb-4 text-brand-hover">Latest Announcements</h2>
-    <div class="space-y-4">
-    {% for announcement in announcements %}
-        <div class="bg-brand-secondary p-6 rounded-2xl shadow-xl">
-            <h4 class="text-xl font-semibold mb-2 text-brand-accent-1">{{ announcement.title }}</h4>
-            <p class="text-sm text-gray-300">{{ announcement.message|linebreaksbr }}</p>
-            <p class="text-xs text-gray-500 mt-3">{{ announcement.created_at|date:"F j, Y, P" }}</p>
-        </div>
-    {% endfor %}
+<div class="bg-brand-secondary p-8 rounded-2xl shadow-xl">
+    <h2 class="text-2xl font-bold mb-4 text-brand-hover">Problem Statement Overview</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b border-gray-600">
+                    <th class="py-3 pr-3">Problem Title</th>
+                    <th class="py-3 px-3 text-center">Teams Selected</th>
+                    <th class="py-3 pl-3">Team Names</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for problem in problems %}
+                <tr class="border-b border-gray-700">
+                    <td class="py-4 pr-3 font-semibold">{{ problem.title }}</td>
+                    <td class="py-4 px-3 text-center">
+                        <span class="text-2xl font-bold {% if problem.team_count >= 3 %}text-red-500{% else %}text-green-400{% endif %}">
+                            {{ problem.team_count }} / 3
+                        </span>
+                    </td>
+                    <td class="py-4 pl-3 text-sm">
+                        {% for team in problem.teams_working_on.all %}
+                            <a href="{% url 'view_team_by_organizer' team.id %}" class="underline hover:text-brand-hover">{{ team.team_name }}</a>{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            <span class="text-gray-500">No teams have selected this problem yet.</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3" class="py-8 text-center text-gray-400">No problem statements have been created.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-{% endif %}
-
+</div>
 {% endblock dashboard_content %}

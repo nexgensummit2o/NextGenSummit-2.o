@@ -1,34 +1,43 @@
-from django.shortcuts import render, redirect
+import uuid
+import pytz
+from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
-from .models import ProblemStatement, ScheduleItem, FAQ, Announcement, Notification
-from .forms import UserProfileForm, UserUpdateForm, CustomPasswordChangeForm, FeedbackForm
-from .models import Team, TeamMember, TeamInvite
-from .forms import TeamCreationForm, TeamInviteForm
-import uuid # For generating unique team codes
-from .forms import SubmissionForm
-from .models import Submission
-from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
-from .models import Submission, JudgingScore
-from .forms import JudgingScoreForm
-from django.core.exceptions import PermissionDenied
-from .models import Certificate
-from datetime import datetime
-import pytz
+from django.db.models import Count
+from .models import *
+from .forms import *
 
-# --- Homepage View ---
+def get_user_role(user):
+    if not user.is_authenticated:
+        return None
+    try:
+        return user.userprofile.user_role
+    except UserProfile.DoesNotExist:
+        return None
+
 def home(request):
+    announcements = Announcement.objects.all().order_by('-created_at')[:3]
     problem_statements = ProblemStatement.objects.all()
     faqs = FAQ.objects.all().order_by('id')
     schedule_day1 = ScheduleItem.objects.filter(day='Day 1: Sep 25, 2025').order_by('start_time')
     schedule_day2 = ScheduleItem.objects.filter(day='Day 2: Sep 26, 2025').order_by('start_time')
     schedule_day3 = ScheduleItem.objects.filter(day='Day 3: Sep 27, 2025').order_by('start_time')
+    profile_complete = False
+    if request.user.is_authenticated:
+        try:
+            profile_complete = request.user.userprofile.is_profile_complete()
+        except UserProfile.DoesNotExist:
+            profile_complete = False
+
     context = {
-        'problem_statements': problem_statements,
+        'announcements': announcements,
+        'profile_complete': profile_complete,
+         #'problem_statements': problem_statements,
         'faqs': faqs,
         'schedule_day1': schedule_day1,
         'schedule_day2': schedule_day2,
@@ -36,25 +45,38 @@ def home(request):
     }
     return render(request, 'event/index.html', context)
 
-# --- Custom Login View ---
+@login_required
+def team_list(request):
+    teams = Team.objects.annotate(member_count=Count('teammember')).filter(member_count__gt=0)
+    user_on_team = TeamMember.objects.filter(participant=request.user, status='accepted').exists()
+    context = {
+        'teams': teams,
+        'user_on_team': user_on_team,
+    }
+    return render(request, 'event/team_list.html', context)
+
 class CustomLoginView(LoginView):
     template_name = 'event/login.html'
-    
+
     def get_success_url(self):
         user = self.request.user
         if user.is_staff:
             return reverse_lazy('admin:index')
-        role = user.userprofile.user_role
+
+        role = get_user_role(user)
         if role == 'participant':
             return reverse_lazy('participant_dashboard')
         elif role == 'judge':
             return reverse_lazy('judge_dashboard')
         elif role == 'organizer':
             return reverse_lazy('organizer_dashboard')
-        else:
-            return reverse_lazy('home')
+        return reverse_lazy('home')
 
-# --- Profile View ---
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been successfully logged out.")
+    return redirect('home')
+
 @login_required
 def profile_view(request):
     if request.method == 'POST':
@@ -64,14 +86,12 @@ def profile_view(request):
                 user_form.save()
                 messages.success(request, 'Your account details have been updated successfully!')
                 return redirect('profile')
-
         elif 'update_profile' in request.POST:
             profile_form = UserProfileForm(request.POST, instance=request.user.userprofile)
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, 'Your profile has been updated successfully!')
                 return redirect('profile')
-        
         elif 'change_password' in request.POST:
             password_form = CustomPasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
@@ -81,7 +101,7 @@ def profile_view(request):
                 return redirect('profile')
             else:
                 messages.error(request, 'Please correct the password errors below.')
-    
+
     user_form = UserUpdateForm(instance=request.user)
     profile_form = UserProfileForm(instance=request.user.userprofile)
     password_form = CustomPasswordChangeForm(request.user)
@@ -89,109 +109,77 @@ def profile_view(request):
         'user_form': user_form,
         'profile_form': profile_form,
         'password_form': password_form,
+        'role': get_user_role(request.user),
     }
     return render(request, 'event/profile.html', context)
 
-# --- Dashboard Views ---
 @login_required
 def participant_dashboard(request):
-    # Fetch all the data needed for the dashboard
-    announcements = Announcement.objects.all().order_by('-created_at')[:5]
-    problem_statements = ProblemStatement.objects.all()
-    
-    schedule_day1 = ScheduleItem.objects.filter(day='Day 1: Sep 25, 2025').order_by('start_time')
-    schedule_day2 = ScheduleItem.objects.filter(day='Day 2: Sep 26, 2025').order_by('start_time')
-    schedule_day3 = ScheduleItem.objects.filter(day='Day 3: Sep 27, 2025').order_by('start_time')
+    profile_complete = False
+    try:
+        profile_complete = request.user.userprofile.is_profile_complete()
+    except UserProfile.DoesNotExist:
+        pass
 
+    announcements = Announcement.objects.all().order_by('-created_at')[:5]
     context = {
         'announcements': announcements,
-        'problem_statements': problem_statements,
-        'schedule_day1': schedule_day1,
-        'schedule_day2': schedule_day2,
-        'schedule_day3': schedule_day3,
+        'profile_complete': profile_complete,
+        'role': get_user_role(request.user),
     }
     return render(request, 'event/dashboard_participant.html', context)
 
+@login_required
 def judge_dashboard(request):
-    if not request.user.userprofile.user_role == 'judge':
+    role = get_user_role(request.user)
+    if not (role == 'judge' or request.user.is_staff):
         raise PermissionDenied("You do not have permission to access this page.")
-    
+
     submissions = Submission.objects.all()
     context = {
         'submissions': submissions,
+        'role': role,
     }
     return render(request, 'event/dashboard_judge.html', context)
 
 @login_required
 def organizer_dashboard(request):
-    # Ensure only organizers and staff can access this page
-    if not (request.user.userprofile.user_role == 'organizer' or request.user.is_staff):
+    role = get_user_role(request.user)
+    if not (role == 'organizer' or request.user.is_staff):
         raise PermissionDenied("You do not have permission to access this page.")
-    
-    # Fetch statistics
-    participant_count = UserProfile.objects.filter(user_role='participant').count()
-    team_count = Team.objects.count()
-    submission_count = Submission.objects.count()
-    
-    # Fetch recent activity
-    recent_submissions = Submission.objects.order_by('-submitted_at')[:5]
 
+    problems = ProblemStatement.objects.annotate(team_count=Count('teams_working_on')).prefetch_related('teams_working_on__leader')
     context = {
-        'announcements': Announcement.objects.all().order_by('-created_at')[:5],
-        'participant_count': participant_count,
-        'team_count': team_count,
-        'submission_count': submission_count,
-        'recent_submissions': recent_submissions,
+        'problems': problems,
+        'role': role,
     }
     return render(request, 'event/dashboard_organizer.html', context)
 
 @login_required
-def notification_list(request):
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    
-    # Mark notifications as read once the user views them
-    unread_notifications = notifications.filter(is_read=False)
-    unread_notifications.update(is_read=True)
-    
-    return render(request, 'event/notifications.html', {'notifications': notifications})
-
-@login_required
-def submit_feedback(request):
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback = form.save(commit=False)
-            feedback.participant = request.user
-            feedback.save()
-            messages.success(request, 'Thank you for your feedback!')
-            return redirect('participant_dashboard') # Or wherever you want to redirect
-    else:
-        form = FeedbackForm()
-    
-    return render(request, 'event/feedback.html', {'form': form})
-
-@login_required
 def team_dashboard(request):
-    try:
-        # Check if user is a member of any team
-        team_member = TeamMember.objects.get(participant=request.user)
+    team_member = TeamMember.objects.filter(participant=request.user, status='accepted').first()
+    user_role = get_user_role(request.user)
+
+    if team_member:
         team = team_member.team
-        members = TeamMember.objects.filter(team=team)
+        members = TeamMember.objects.filter(team=team, status='accepted')
+        pending_requests = TeamMember.objects.filter(team=team, status='pending')
         invite_form = TeamInviteForm()
-        
         context = {
             'team': team,
             'members': members,
+            'pending_requests': pending_requests,
             'invite_form': invite_form,
+            'role': user_role,
         }
         return render(request, 'event/team_dashboard.html', context)
-    except TeamMember.DoesNotExist:
-        # User is not on a team, show creation form and invites
+    else:
         creation_form = TeamCreationForm()
         invites = TeamInvite.objects.filter(invited_email=request.user.email, status='pending')
         context = {
             'creation_form': creation_form,
             'invites': invites,
+            'role': user_role,
         }
         return render(request, 'event/no_team_dashboard.html', context)
 
@@ -202,14 +190,10 @@ def create_team(request):
         if form.is_valid():
             team = form.save(commit=False)
             team.leader = request.user
-            team.team_code = uuid.uuid4().hex[:8].upper() # Generate a random unique code
+            team.team_code = uuid.uuid4().hex[:8].upper()
             team.save()
-            
-            # Add the leader as the first member
             TeamMember.objects.create(team=team, participant=request.user, role='leader', status='accepted')
-            
             messages.success(request, f"Team '{team.team_name}' created successfully!")
-            return redirect('team_dashboard')
     return redirect('team_dashboard')
 
 @login_required
@@ -224,6 +208,37 @@ def invite_member(request):
                 messages.success(request, f"Invitation sent to {email}.")
         except Team.DoesNotExist:
             messages.error(request, "You are not the leader of a team.")
+    return redirect('team_dashboard')
+
+
+@login_required
+def request_to_join_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if TeamMember.objects.filter(participant=request.user, status='accepted').exists():
+        messages.error(request, "You are already on a team.")
+        return redirect('team_list')
+
+    TeamMember.objects.get_or_create(
+        team=team,
+        participant=request.user,
+        defaults={'role': 'member', 'status': 'pending'}
+    )
+    messages.success(request, f"Your request to join '{team.team_name}' has been sent.")
+    return redirect('team_list')
+
+@login_required
+def handle_join_request(request, member_id, action):
+    join_request = get_object_or_404(TeamMember, id=member_id, status='pending')
+    if request.user != join_request.team.leader:
+        raise PermissionDenied("You do not have permission to perform this action.")
+
+    if action == 'accept':
+        join_request.status = 'accepted'
+        join_request.save(update_fields=['status'])
+        messages.success(request, f"Accepted {join_request.participant.username} into the team.")
+    elif action == 'decline':
+        messages.info(request, f"Declined join request from {join_request.participant.username}.")
+        join_request.delete()
     return redirect('team_dashboard')
 
 @login_required
@@ -244,41 +259,55 @@ def handle_invite(request, invite_id, action):
     return redirect('team_dashboard')
 
 @login_required
-def submit_solution(request):
+def select_problem(request, problem_id):
+    problem = get_object_or_404(ProblemStatement, id=problem_id)
+    team = request.user.led_teams.first()
+    if not team:
+        raise PermissionDenied("You are not the leader of a team.")
+    if problem.teams_working_on.count() >= 3:
+        messages.error(request, f"Sorry, '{problem.title}' has the maximum number of teams.")
+        return redirect('submit_playground')
+    team.selected_problem = problem
+    team.save()
+    messages.success(request, f"Your team has selected the problem: '{problem.title}'.")
+    return redirect('submit_playground')
+
+@login_required
+def submit_playground(request):
     try:
-        team = request.user.led_teams.first()
-        if not team:
-             # This check ensures only a team leader can access the page
-             raise PermissionDenied("You are not the leader of a team.")
-    except Team.DoesNotExist:
-        return redirect('team_dashboard') # Redirect if user is not a leader
+        team = TeamMember.objects.get(participant=request.user, status='accepted').team
+    except TeamMember.DoesNotExist:
+        messages.error(request, "You must be on a team to access the playground.")
+        return redirect('participant_dashboard')
 
-    # Check if a submission already exists for this team
-    submission, created = Submission.objects.get_or_create(team=team)
-
+    submission, created = Submission.objects.get_or_create(team=team, defaults={'problem_statement': team.selected_problem})
     if request.method == 'POST':
-        form = SubmissionForm(request.POST, instance=submission)
+        form = SubmissionPlaygroundForm(request.POST, request.FILES, instance=submission)
         if form.is_valid():
-            submission = form.save(commit=False)
-            submission.team = team
-            submission.save()
-            messages.success(request, 'Your submission has been saved successfully!')
-            return redirect('team_dashboard')
+            form.save()
+            messages.success(request, "Your playground has been updated!")
+            return redirect('submit_playground')
     else:
-        form = SubmissionForm(instance=submission)
+        form = SubmissionPlaygroundForm(instance=submission)
 
-    return render(request, 'event/submit_solution.html', {'form': form, 'submission': submission})
-
+    available_problems = ProblemStatement.objects.annotate(team_count=Count('teams_working_on')).filter(team_count__lt=3)
+    context = {
+        'team': team,
+        'submission': submission,
+        'form': form,
+        'available_problems': available_problems,
+        'role': get_user_role(request.user),
+    }
+    return render(request, 'event/submit_playground.html', context)
 
 @login_required
 def score_submission(request, submission_id):
-    if not request.user.userprofile.user_role == 'judge':
+    role = get_user_role(request.user)
+    if not (role == 'judge' or request.user.is_staff):
         raise PermissionDenied("You do not have permission to access this page.")
-        
-    submission = get_object_or_404(Submission, id=submission_id)
-    # Get or create a score instance for this judge and this submission
-    score, created = JudgingScore.objects.get_or_create(judge=request.user, submission=submission)
 
+    submission = get_object_or_404(Submission, id=submission_id)
+    score, created = JudgingScore.objects.get_or_create(judge=request.user, submission=submission)
     if request.method == 'POST':
         form = JudgingScoreForm(request.POST, instance=score)
         if form.is_valid():
@@ -287,12 +316,40 @@ def score_submission(request, submission_id):
             return redirect('judge_dashboard')
     else:
         form = JudgingScoreForm(instance=score)
-
     context = {
         'form': form,
         'submission': submission,
+        'role': role,
     }
     return render(request, 'event/score_submission.html', context)
+
+@login_required
+def submit_feedback(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.participant = request.user
+            feedback.save()
+            messages.success(request, 'Thank you for your feedback!')
+            return redirect('participant_dashboard')
+    else:
+        form = FeedbackForm()
+    context = {
+        'form': form,
+        'role': get_user_role(request.user),
+    }
+    return render(request, 'event/feedback.html', context)
+
+@login_required
+def notification_list(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    notifications.filter(is_read=False).update(is_read=True)
+    context = {
+        'notifications': notifications,
+        'role': get_user_role(request.user),
+    }
+    return render(request, 'event/notifications.html', context)
 
 @login_required
 def view_certificate(request):
@@ -300,16 +357,58 @@ def view_certificate(request):
         certificate = Certificate.objects.get(user=request.user)
     except Certificate.DoesNotExist:
         certificate = None
-    
-    # Set the unlock time: Day 3, 11:00 AM IST
+
     unlock_time = datetime(2025, 9, 27, 11, 0, 0, tzinfo=pytz.timezone('Asia/Kolkata'))
     now = datetime.now(pytz.timezone('Asia/Kolkata'))
-    
     is_unlocked = now >= unlock_time
-    
     context = {
         'certificate': certificate,
         'is_unlocked': is_unlocked,
         'unlock_time': unlock_time,
+        'role': get_user_role(request.user),
     }
     return render(request, 'event/certificate.html', context)
+
+@login_required
+def view_team_by_organizer(request, team_id):
+    role = get_user_role(request.user)
+    if not (role == 'organizer' or request.user.is_staff):
+        raise PermissionDenied("You do not have permission to access this page.")
+    team = get_object_or_404(Team, id=team_id)
+    context = {
+        'team': team,
+        'role': role,
+    }
+    return render(request, 'event/view_team_by_organizer.html', context)
+
+
+@login_required
+def delete_team(request):
+    if request.method == 'POST':
+        team = get_object_or_404(Team, leader=request.user)
+        team_name = team.team_name
+        team.delete()
+        messages.success(request, f"Team '{team_name}' has been successfully deleted.")
+        return redirect('team_dashboard')
+    return redirect('team_dashboard')
+
+@login_required
+def exit_team(request):
+    if request.method == 'POST':
+        try:
+            team_member = TeamMember.objects.get(participant=request.user, status='accepted')
+
+            if team_member.role == 'leader':
+                messages.error(request, "As the team leader, you cannot leave the team. You must delete it instead.")
+                return redirect('team_dashboard')
+
+            team_name = team_member.team.team_name
+            team_member.delete()
+            messages.success(request, f"You have successfully left the team '{team_name}'.")
+            return redirect('team_dashboard')
+
+        except TeamMember.DoesNotExist:
+            messages.error(request, "You are not on a team.")
+            return redirect('participant_dashboard')
+
+    return redirect('team_dashboard')

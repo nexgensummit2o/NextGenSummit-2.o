@@ -1,16 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-
-# Get Django's built-in User model
-User = get_user_model()
-
+from django.contrib.auth.models import User
 
 # --- Section 1: User and Profile Management ---
-
 class UserProfile(models.Model):
-    """
-    Extends Django's built-in User model with profile information and a mandatory role.
-    """
     ROLE_CHOICES = [
         ('participant', 'Participant'),
         ('judge', 'Judge'),
@@ -18,40 +10,28 @@ class UserProfile(models.Model):
         ('volunteer', 'Volunteer'),
         ('admin', 'Admin'),
     ]
-
-    # This links our profile to a specific user.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    
-    # This is a mandatory dropdown field for the user's role in the event.
     user_role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    
     student_roll_number = models.CharField(max_length=255, blank=True, null=True)
     about = models.TextField(blank=True, null=True)
-    highlight = models.CharField(max_length=255, blank=True, null=True)
     branch = models.CharField(max_length=255, blank=True, null=True)
     year_of_study = models.IntegerField(blank=True, null=True)
-    skills = models.JSONField(blank=True, null=True)
-    technical_skills = models.JSONField(blank=True, null=True)
     linkedin = models.URLField(max_length=255, blank=True, null=True)
     github = models.URLField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        # The get_user_role_display() method gets the human-readable value from choices.
         return f"{self.user.username} - {self.get_user_role_display()}"
 
+    def is_profile_complete(self):
+        return bool(self.user.first_name and self.user.last_name)
 
 # --- Section 2: Core Hackathon & Event Data ---
-
 class ScheduleItem(models.Model):
-    """
-    Stores a single event in the schedule, like a workshop or a talk.
-    """
     DAY_CHOICES = [
         ('Day 1: Sep 25, 2025', 'Day 1: Sep 25, 2025'),
         ('Day 2: Sep 26, 2025', 'Day 2: Sep 26, 2025'),
         ('Day 3: Sep 27, 2025', 'Day 3: Sep 27, 2025'),
     ]
-    
     day = models.CharField(max_length=50, choices=DAY_CHOICES)
     start_time = models.TimeField()
     end_time = models.TimeField(blank=True, null=True)
@@ -65,9 +45,6 @@ class ScheduleItem(models.Model):
         return f"{self.day} - {self.title}"
 
 class ScheduleDetail(models.Model):
-    """
-    Provides optional, detailed 'about' information for a specific schedule item.
-    """
     schedule_item = models.OneToOneField(ScheduleItem, on_delete=models.CASCADE, primary_key=True)
     details = models.TextField(help_text="Add detailed information about this schedule item here.")
 
@@ -111,13 +88,12 @@ class Feedback(models.Model):
     def __str__(self):
         return f"Feedback from {self.participant.username}"
 
-
 # --- Section 3: Team and Submission Management ---
-
 class Team(models.Model):
     team_name = models.CharField(max_length=255)
     team_code = models.CharField(max_length=255, unique=True)
     leader = models.ForeignKey(User, related_name='led_teams', on_delete=models.CASCADE)
+    selected_problem = models.ForeignKey(ProblemStatement, on_delete=models.SET_NULL, null=True, blank=True, related_name='teams_working_on')
     max_size = models.IntegerField(default=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -132,7 +108,7 @@ class TeamMember(models.Model):
     participant = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     joined_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='accepted')
 
     class Meta:
         unique_together = ('team', 'participant')
@@ -152,16 +128,19 @@ class TeamInvite(models.Model):
         return f"Invite for {self.invited_email} to {self.team.team_name}"
 
 class Submission(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    problem_statement = models.ForeignKey(ProblemStatement, on_delete=models.CASCADE)
-    project_title = models.CharField(max_length=255)
+    team = models.OneToOneField(Team, on_delete=models.CASCADE)
+    problem_statement = models.ForeignKey(ProblemStatement, on_delete=models.CASCADE, null=True, blank=True)
+    project_title = models.CharField(max_length=255, blank=True, null=True)
     project_description = models.TextField(blank=True, null=True)
     repo_link = models.URLField(max_length=255, blank=True, null=True)
     demo_link = models.URLField(max_length=255, blank=True, null=True)
-    submitted_at = models.DateTimeField(auto_now_add=True)
+    # ADDED FIELDS
+    ideation_text = models.TextField(blank=True, null=True)
+    plan_pdf = models.FileField(upload_to='plans/', blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.project_title} by {self.team.team_name}"
+        return f"{self.project_title or 'Untitled'} by {self.team.team_name}"
 
 class JudgingScore(models.Model):
     judge = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -172,9 +151,7 @@ class JudgingScore(models.Model):
     class Meta:
         unique_together = ('judge', 'submission')
 
-
-# --- Section 4: Communication ---
-
+# --- Section 4: Communication & Certificates ---
 class Announcement(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()

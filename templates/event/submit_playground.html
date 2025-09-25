@@ -1,0 +1,64 @@
+{% extends 'event/dashboard_base.html' %}
+{% block title %}Submission Playground{% endblock %}
+
+{% block dashboard_content %}
+<h1 class="text-3xl font-bold mb-6">Submission Playground</h1>
+
+<div class="space-y-8">
+    <div class="bg-brand-secondary p-6 rounded-2xl">
+        <h2 class="text-2xl font-bold flex items-center gap-3">
+            {% if team.selected_problem %}✔️{% else %}1️⃣{% endif %} Select Problem Statement
+        </h2>
+        {% if team.selected_problem %}
+            <p class="mt-2 text-green-400">Completed. You selected: <span class="font-bold">{{ team.selected_problem.title }}</span></p>
+        {% else %}
+            <p class="mt-2 text-yellow-400">Your team leader must select one problem. You cannot change it later.</p>
+            {% if user == team.leader %}
+            <div class="mt-4 space-y-3">
+                {% for problem in available_problems %}
+                <div class="bg-brand-bg p-4 rounded-lg flex justify-between items-center">
+                    <p>{{ problem.title }}</p>
+                    <a href="{% url 'select_problem' problem.id %}" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg">Select</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="bg-brand-secondary p-6 rounded-2xl {% if not team.selected_problem %}opacity-50{% endif %}">
+        <h2 class="text-2xl font-bold">
+            {% if submission.ideation_text %}✔️{% else %}2️⃣{% endif %} Submit Your Ideation & Plan
+        </h2>
+        {% if team.selected_problem %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label class="font-semibold">{{ form.ideation_text.label }}</label>
+                    {{ form.ideation_text }}
+                </div>
+                <div>
+                    <label class="font-semibold">{{ form.plan_pdf.label }}</label>
+                    {% if submission.plan_pdf %}
+                        <p class="text-sm text-gray-400">Current file: <a href="{{ submission.plan_pdf.url }}" target="_blank" class="underline">{{ submission.plan_pdf.name }}</a></p>
+                    {% endif %}
+                    {{ form.plan_pdf }}
+                </div>
+                 <div>
+                    <label class="font-semibold">{{ form.repo_link.label }}</label>
+                    {{ form.repo_link }}
+                </div>
+                 <div>
+                    <label class="font-semibold">{{ form.demo_link.label }}</label>
+                    {{ form.demo_link }}
+                </div>
+            </div>
+            <button type="submit" class="mt-6 py-2 px-6 bg-brand-accent-1 rounded-lg">Save Playground</button>
+        </form>
+        {% else %}
+        <p class="mt-2 text-gray-500">You must select a problem statement first.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
