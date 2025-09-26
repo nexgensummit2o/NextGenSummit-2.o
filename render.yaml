@@ -10,7 +10,7 @@ services:
     name: nextgensummit2-web
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"
+    startCommand: "gunicorn mysite.asgi:application --bind 0.0.0.0:$PORT -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
