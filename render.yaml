@@ -1,5 +1,5 @@
 databases:
-  - name: nextgensummit2-db-free 
+  - name: nextgensummit2-db-free
     plan: free
     databaseName: nextgensummit2_db
     user: nextgensummit2
@@ -10,11 +10,11 @@ services:
     name: nextgensummit2-web
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "python -m gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"
+    startCommand: "gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: nextgensummit2-db-free 
+          name: nextgensummit2-db-free
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
