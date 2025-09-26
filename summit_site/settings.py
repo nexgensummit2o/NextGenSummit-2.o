@@ -1,4 +1,8 @@
 from pathlib import Path
+import dj_database_url
+import os
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,6 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -52,16 +57,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'summit_site.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'NextGenSummitDB',
-        'USER': 'root',
-        'PASSWORD': '7386104491', # IMPORTANT: Keep this secret
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    }
+    'default': dj_database_url.config(
+        default='postgresql://nextgensummit2:flxbpA3uL1CNLNrzeKGmGKpZoyAMTtQ5@dpg-d3aho5ggjchc73cmo3q0-a.oregon-postgres.render.com/nextgensummit2_db',
+        conn_max_age=600
+    )
 }
-
+# Password validation
 # ... (Password validators, Internationalization, etc.) ...
 
 LANGUAGE_CODE = 'en-us'
@@ -79,3 +80,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
+    # and renames the files with unique names for each version to support long-term caching
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
